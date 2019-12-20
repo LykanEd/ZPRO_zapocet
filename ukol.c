@@ -271,6 +271,12 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
     if (data->nazev[0] == '\0') {
       printf("Chybny format souboru\n");
     } else{
+      // testovani dat
+      int pocet_udaju = TEST_pocet_udaju(data);
+      if (pocet_udaju != 4) {
+        return 1;
+        zrus_seznam(s);
+      }
 
       printf("radek zpracovan\n");
 
@@ -289,7 +295,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test1.txt", "r");
+  FILE* soubor = fopen("test3.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;
@@ -303,6 +309,10 @@ int main(){
   printf("Vytvoren seznam\n" );
 
   int check = nacist_soubor(&s, soubor);
+  if (check != 0) {
+    printf("Nekompletni seznam\n");
+    return 0;
+  }
 
   printf("nacten seznam\n" );
   if (s.zacatek != NULL) {

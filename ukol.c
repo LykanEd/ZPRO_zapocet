@@ -125,6 +125,12 @@ int prazdna_polozka(char* polozka){
 }
 
 data_typ* zpracuj_radek(const char* string){
+  /*
+  Zpracuje radek, overi pocet udaju na radku (pomoci poctu stredniku) a vrati
+  data_typ* naplneny polozkami z radku.
+  */
+
+  // kontrola poctu stredniku
   int pocet_stredniku = 0
   for (size_t i = 0; i < strlen(string); i++) {
     if (string[i] == ';') {
@@ -135,14 +141,13 @@ data_typ* zpracuj_radek(const char* string){
     return NULL;
   }
 
+  // alokace data_typ a nahrani dat
   data_typ* data = malloc(sizeof(data_typ));
   if(data == NULL){
     printf("chyba alokace\n");
     fclose(soubor);
     return 1;
   }
-  // zpracovani radku
-  int pocet_udaju = 0;
 
   char* nazev = nacti_polozky(string, 0);
   data->nazev = nazev;
@@ -165,8 +170,29 @@ data_typ* zpracuj_radek(const char* string){
   char* stav = nacti_polozky(string, strlen(kontrola));
   data->stav = stav;
 
-  retrun data;
+  return data;
 }
+
+//--------------------------------------------------------------
+// TESTOVACI FUNKCE
+int TEST_prazdny_string(char* string){
+  /*
+  Kontroluje, jestli je daný string prázdný, pokud ano, vrátí 0,
+  pokud ne, vrátí 1;
+  */
+  for (size_t i = 0; i < strlen(string); i++) {
+    if (isspace(string[i]) == 0) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int TEST_pocet_udaju(data_typ* data){
+    return 1;
+}
+
+//--------------------------------------------------------------
 
 void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 	while(!feof(soubor)){

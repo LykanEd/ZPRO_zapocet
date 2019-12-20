@@ -15,8 +15,8 @@ typedef struct
 	char 	typ[15];
 	char	cislo[20];
 	char 	odpovedny[25];
-	char	datum[15];
-	char 	kontrola[25];
+	char	datum[25];
+	char 	kontrola[30];
 	char	stav[15];
 }data_typ;
 
@@ -81,6 +81,7 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 	if (uzl == NULL){
 		free(data);
 	}
+  printf("vytvoren uzel\n" );
 
 	if (s->zacatek != NULL){
 		uzl->naslednik = s->zacatek;
@@ -92,7 +93,7 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 }
 
 void vypis_data(data_typ* data){
-	printf("%s %s %s %s %s %s %s\n",
+	printf("%s %s %s %s %s %s %s \n",
             data->nazev,
             data->typ,
             data->cislo,
@@ -131,10 +132,6 @@ void zrus_seznam(spojovy_seznam* s)
 //--------------------------------------------------------------
 
 void nacti_polozku(const char* string, int zacatek, char* polozka){
-	if(zacatek == strlen(string)-1){
-    polozka = NULL;
-	}
-
   int vytvoreno = 0;
 
   // vytvoreni polozky, pokud bude nalezen strednik
@@ -142,16 +139,24 @@ void nacti_polozku(const char* string, int zacatek, char* polozka){
 		if (string[i] == ';'){
 			for(int j = 0; j < i-zacatek; j++){
 				polozka[j] = string[zacatek + j];
+        if (j == i-zacatek - 1) {
+          polozka[j+1] = '\0';
+        }
 			}
       vytvoreno = 1;
+      break;
 		}
 	}
   // vytvoreni polozky, pokud nebyl nalezen strednik
   if(vytvoreno == 0){
     for(int j = 0; j < strlen(string) - zacatek; j++){
-      polozka[j] = string[zacatek + j];
+        polozka[j] = string[zacatek + j];
+        if (j == strlen(string) - zacatek - 1) {
+          polozka[j+1] = '\0';
+        }
       }
   }
+  printf("%s\n", polozka);
 }
 
 int prazdna_polozka(char* polozka){
@@ -163,7 +168,7 @@ int prazdna_polozka(char* polozka){
 	return 0;
 }
 
-data_typ* zpracuj_radek(const char* string){
+data_typ* zpracuj_radek(const char* string, data_typ* data){
   /*
   Zpracuje radek, overi pocet udaju na radku (pomoci poctu stredniku) a vrati
   data_typ* naplneny polozkami z radku.
@@ -180,33 +185,45 @@ data_typ* zpracuj_radek(const char* string){
     return NULL;
   }
 
-  // alokace data_typ a nahrani dat
-  data_typ* data = malloc(sizeof(data_typ));
-  if(data == NULL){
-    printf("chyba alokace\n");
-    return NULL;
-  }
+  int zacatek = 0;
+  nacti_polozku(string, zacatek, data->nazev);
+  zacatek += strlen(data->nazev)+1;
+  printf("%s\n", data->nazev);
 
-  char* nazev = nacti_polozku(string, 0);
-  data->nazev = nazev;
+  nacti_polozku(string, zacatek, data->typ);
+  zacatek += strlen(data->typ)+1;
+  printf("%s\n", data->typ);
 
-  char* typ = nacti_polozku(string, strlen(nazev));
-  data->typ = typ;
+  nacti_polozku(string, zacatek, data->cislo);
+  zacatek += strlen(data->cislo)+1;
+  printf("%s\n", data->cislo);
 
-  char* cislo = nacti_polozku(string, strlen(typ));
-  data->cislo = cislo;
+  nacti_polozku(string, zacatek, data->odpovedny);
+  zacatek += strlen(data->odpovedny)+1;
+  printf("%s\n", data->odpovedny);
 
-  char* odpovedny = nacti_polozku(string, strlen(cislo));
-  data->odpovedny = odpovedny;
+  nacti_polozku(string, zacatek, data->datum);
+  zacatek += strlen(data->datum)+1;
+  printf("%s\n", data->datum);
 
-  char* datum = nacti_polozku(string, strlen(odpovedny));
-  data->datum = datum;
+  nacti_polozku(string, zacatek, data->kontrola);
+  zacatek += strlen(data->kontrola)+1;
+  printf("%s\n", data->datum);
+  printf("%s\n", data->kontrola);
 
-  char* kontrola = nacti_polozku(string, strlen(datum));
-  data->kontrola = kontrola;
+  nacti_polozku(string, zacatek, data->stav);
+  printf("%s\n", data->stav);
+  printf("%s\n", data->datum);
 
-  char* stav = nacti_polozku(string, strlen(kontrola));
-  data->stav = stav;
+  vypis_data(data);
+
+  char	nazev[30];
+	char 	typ[15];
+	char	cislo[20];
+	char 	odpovedny[25];
+	char	datum[15];
+	char 	kontrola[25];
+	char	stav[15];
 
   return data;
 }
@@ -236,23 +253,33 @@ int TEST_pocet_udaju(data_typ* data){
 void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 	while(!feof(soubor)){
 		// Precteni radku
+    printf("nacten radek\n");
 		char radek[1000];
 		fgetLine(soubor, radek, 1000);
 		// preskocit hlavicku
-		if (radek[0] == '#')
+		if (radek[0] == '#'){
+      printf("preskocen prvni\n");
 			continue;
+      }
 		// vytvoreni dat
+    printf("neni prvni, vytvarim data\n");
 		data_typ* data = malloc(sizeof(data_typ));
 		if(data == NULL){
 			printf("chyba alokace\n");
 			fclose(soubor);
-			return 1;
+			return;
 		}
+    printf("data vytvorena, zpracovavam radek\n");
 		// zpracovani radku
-		data_typ* zpracovano = zpracuj_radek(radek);
+		data = zpracuj_radek(radek, data);
+    printf("radek zpracovan\n");
+
+    //vypis_data(data);
+    printf("\n" );
 
 		//vlozit data do seznamu
-		na_zacatek(&s, zpracovano);
+		na_zacatek(s, data);
+    printf("radek vlozen do seznamu\n");
 
 	}
 }
@@ -261,19 +288,26 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test1.txt", "r");
+  FILE* soubor = fopen("test0.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;
 	}
+  printf("Otevren soubor\n" );
 
   spojovy_seznam s;
 	s.zacatek = NULL;
 	s.konec = NULL;
 
+  printf("Vytvoren seznam\n" );
+
   nacist_soubor(&s, soubor);
 
+  printf("nacten seznam\n" );
+
   vypis_seznam(&s);
+
+  printf("vypsan seznam\n" );
 
   fclose(soubor);
 	zrus_seznam(&s);

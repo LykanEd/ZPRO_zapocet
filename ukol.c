@@ -234,7 +234,13 @@ int TEST_prazdny_string(char* string){
 }
 
 int TEST_pocet_udaju(data_typ* data){
-    return 1;
+    int prazdne = 0;
+
+    prazdne += TEST_prazdny_string(data->nazev);
+    prazdne += TEST_prazdny_string(data->typ);
+    prazdne += TEST_prazdny_string(data->cislo);
+    prazdne += TEST_prazdny_string(data->odpovedny);
+    return prazdne;
 }
 
 //--------------------------------------------------------------
@@ -282,7 +288,7 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test0.txt", "r");
+  FILE* soubor = fopen("test1.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;

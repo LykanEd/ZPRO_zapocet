@@ -63,6 +63,19 @@ bool fgetLine(FILE* soubor, char* string, int maxDelka)
     return false;
 }
 
+uzel* vytvor_uzel(data_typ* data){
+	uzel* uzl = malloc(sizeof(uzel));
+	if(uzl == NULL){
+		printf("chyba alokace\n");
+		return NULL;
+	}
+
+	uzl->data = data;
+	uzl->naslednik = NULL;
+
+	return uzl;
+}
+
 void na_zacatek(spojovy_seznam* s, data_typ* data){
 	uzel* uzl = vytvor_uzel(data);
 	if (uzl == NULL){
@@ -76,6 +89,18 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 		s->zacatek = uzl;
 		s->konec = uzl;
 	}
+}
+
+void vypis_data(data_typ* data){
+	printf("%s %s %s %s %s %s %s\n",
+            data->nazev,
+            data->typ,
+            data->cislo,
+            data->odpovedny,
+            data->datum,
+            data->kontrola,
+            data->stav
+        );
 }
 
 void vypis_seznam(spojovy_seznam* s){
@@ -92,24 +117,35 @@ void vypis_seznam(spojovy_seznam* s){
 	printf("\n");
 }
 
-char* nacti_polozku(const char* string, int zacatek){
+void zrus_seznam(spojovy_seznam* s)
+{
+	while (s->zacatek != NULL) {
+		uzel* aktualni = s->zacatek;
+		s->zacatek = aktualni->naslednik;
+		free(aktualni->data);
+		free(aktualni);
+	}
+	s->konec = NULL;
+}
+
+//--------------------------------------------------------------
+
+char * nacti_polozku(const char* string, int zacatek){
 	if(zacatek == strlen(string)-1){
-		char chyba[5];
-		chyba = "CHYBA";
-		return chyba;
+    return NULL;
 	}
 
 	for (int i = zacatek; i < strlen(string); i++){
 		if (string[i] == 'i'){
-			char polozka[i-zacatek];
-			for(int j = 0, j < i-zacatek, j++){
+			char *polozka = malloc(i-zacatek);
+			for(int j = 0; j < i-zacatek; j++){
 				polozka[j] = string[zacatek + j];
 			}
 			return polozka;
 		}
 	}
-	char polozka[strlen(string)-zacatek];
-	for(int j = 0, j < strlen(string) - zacatek, j++){
+	char *polozka = malloc(strlen(string)-zacatek);
+	for(int j = 0; j < strlen(string) - zacatek; j++){
 		polozka[j] = string[zacatek + j];
 		}
 	return polozka;
@@ -131,7 +167,7 @@ data_typ* zpracuj_radek(const char* string){
   */
 
   // kontrola poctu stredniku
-  int pocet_stredniku = 0
+  int pocet_stredniku = 0;
   for (size_t i = 0; i < strlen(string); i++) {
     if (string[i] == ';') {
       pocet_stredniku++;
@@ -145,29 +181,28 @@ data_typ* zpracuj_radek(const char* string){
   data_typ* data = malloc(sizeof(data_typ));
   if(data == NULL){
     printf("chyba alokace\n");
-    fclose(soubor);
-    return 1;
+    return NULL;
   }
 
-  char* nazev = nacti_polozky(string, 0);
+  char* nazev = nacti_polozku(string, 0);
   data->nazev = nazev;
 
-  char* typ = nacti_polozky(string, strlen(nazev));
+  char* typ = nacti_polozku(string, strlen(nazev));
   data->typ = typ;
 
-  char* cislo = nacti_polozky(string, strlen(typ));
+  char* cislo = nacti_polozku(string, strlen(typ));
   data->cislo = cislo;
 
-  char* odpovedny = nacti_polozky(string, strlen(cislo));
+  char* odpovedny = nacti_polozku(string, strlen(cislo));
   data->odpovedny = odpovedny;
 
-  char* datum = nacti_polozky(string, strlen(odpovedny));
+  char* datum = nacti_polozku(string, strlen(odpovedny));
   data->datum = datum;
 
-  char* kontrola = nacti_polozky(string, strlen(datum));
+  char* kontrola = nacti_polozku(string, strlen(datum));
   data->kontrola = kontrola;
 
-  char* stav = nacti_polozky(string, strlen(kontrola));
+  char* stav = nacti_polozku(string, strlen(kontrola));
   data->stav = stav;
 
   return data;
@@ -175,6 +210,7 @@ data_typ* zpracuj_radek(const char* string){
 
 //--------------------------------------------------------------
 // TESTOVACI FUNKCE
+
 int TEST_prazdny_string(char* string){
   /*
   Kontroluje, jestli je daný string prázdný, pokud ano, vrátí 0,
@@ -210,31 +246,10 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 			return 1;
 		}
 		// zpracovani radku
-		int pocet_udaju = 0;
-
-		char* nazev = nacti_polozky(string, 0);
-		data->nazev = nazev;
-
-		char* typ = nacti_polozky(string, strlen(nazev));
-		data->typ = typ;
-
-		char* cislo = nacti_polozky(string, strlen(typ));
-		data->cislo = cislo;
-
-		char* odpovedny = nacti_polozky(string, strlen(cislo));
-		data->odpovedny = odpovedny;
-
-		char* datum = nacti_polozky(string, strlen(odpovedny));
-		data->datum = datum;
-
-		char* kontrola = nacti_polozky(string, strlen(datum));
-		data->kontrola = kontrola;
-
-		char* stav = nacti_polozky(string, strlen(kontrola));
-		data->stav = stav;
+		data_typ* zpracovano = zpracuj_radek(radek);
 
 		//vlozit data do seznamu
-		na_zacatek(&s, data);
+		na_zacatek(&s, zpracovano);
 
 	}
 }
@@ -243,5 +258,21 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
+  FILE* soubor = fopen("test1.txt", "r");
+	if (soubor == NULL) {
+	    printf("chyba otevreni souboru\n");
+	    return 1;
+	}
+
+  spojovy_seznam s;
+	s.zacatek = NULL;
+	s.konec = NULL;
+
+  nacist_soubor(&s, soubor);
+
+  vypis_seznam(&s);
+
+  fclose(soubor);
+	zrus_seznam(&s);
 	return 0;
 }

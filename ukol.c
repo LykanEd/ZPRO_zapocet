@@ -130,25 +130,28 @@ void zrus_seznam(spojovy_seznam* s)
 
 //--------------------------------------------------------------
 
-char * nacti_polozku(const char* string, int zacatek){
+void nacti_polozku(const char* string, int zacatek, char* polozka){
 	if(zacatek == strlen(string)-1){
-    return NULL;
+    polozka = NULL;
 	}
 
+  int vytvoreno = 0;
+
+  // vytvoreni polozky, pokud bude nalezen strednik
 	for (int i = zacatek; i < strlen(string); i++){
-		if (string[i] == 'i'){
-			char *polozka = malloc(i-zacatek);
+		if (string[i] == ';'){
 			for(int j = 0; j < i-zacatek; j++){
 				polozka[j] = string[zacatek + j];
 			}
-			return polozka;
+      vytvoreno = 1;
 		}
 	}
-	char *polozka = malloc(strlen(string)-zacatek);
-	for(int j = 0; j < strlen(string) - zacatek; j++){
-		polozka[j] = string[zacatek + j];
-		}
-	return polozka;
+  // vytvoreni polozky, pokud nebyl nalezen strednik
+  if(vytvoreno == 0){
+    for(int j = 0; j < strlen(string) - zacatek; j++){
+      polozka[j] = string[zacatek + j];
+      }
+  }
 }
 
 int prazdna_polozka(char* polozka){

@@ -245,7 +245,7 @@ int TEST_pocet_udaju(data_typ* data){
 
 //--------------------------------------------------------------
 
-void nacist_soubor(spojovy_seznam* s, FILE* soubor){
+int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 	while(!feof(soubor)){
     printf("NOVY radek\n");
 		// Precteni radku
@@ -282,6 +282,7 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
       printf("radek vlozen do seznamu\n");
       }
 	}
+  return 0;
 }
 
 
@@ -301,7 +302,7 @@ int main(){
 
   printf("Vytvoren seznam\n" );
 
-  nacist_soubor(&s, soubor);
+  int check = nacist_soubor(&s, soubor);
 
   printf("nacten seznam\n" );
   if (s.zacatek != NULL) {

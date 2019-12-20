@@ -68,7 +68,7 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 	if (uzl == NULL){
 		free(data);
 	}
-	
+
 	if (s->zacatek != NULL){
 		uzl->naslednik = s->zacatek;
 		s->zacatek = uzl;
@@ -92,13 +92,13 @@ void vypis_seznam(spojovy_seznam* s){
 	printf("\n");
 }
 
-char* nacti_polozky(const char* string, int zacatek){
+char* nacti_polozku(const char* string, int zacatek){
 	if(zacatek == strlen(string)-1){
 		char chyba[5];
 		chyba = "CHYBA";
 		return chyba;
 	}
-	
+
 	for (int i = zacatek; i < strlen(string); i++){
 		if (string[i] == 'i'){
 			char polozka[i-zacatek];
@@ -119,9 +119,53 @@ int prazdna_polozka(char* polozka){
 	for (int i = 0; i < strlen(polozka); i++){
 		if (isspace(polozka[i])){
 			return 1;
-		} 
+		}
 	}
 	return 0;
+}
+
+data_typ* zpracuj_radek(const char* string){
+  int pocet_stredniku = 0
+  for (size_t i = 0; i < strlen(string); i++) {
+    if (string[i] == ';') {
+      pocet_stredniku++;
+    }
+  }
+  if (pocet_stredniku != 6) {
+    return NULL;
+  }
+
+  data_typ* data = malloc(sizeof(data_typ));
+  if(data == NULL){
+    printf("chyba alokace\n");
+    fclose(soubor);
+    return 1;
+  }
+  // zpracovani radku
+  int pocet_udaju = 0;
+
+  char* nazev = nacti_polozky(string, 0);
+  data->nazev = nazev;
+
+  char* typ = nacti_polozky(string, strlen(nazev));
+  data->typ = typ;
+
+  char* cislo = nacti_polozky(string, strlen(typ));
+  data->cislo = cislo;
+
+  char* odpovedny = nacti_polozky(string, strlen(cislo));
+  data->odpovedny = odpovedny;
+
+  char* datum = nacti_polozky(string, strlen(odpovedny));
+  data->datum = datum;
+
+  char* kontrola = nacti_polozky(string, strlen(datum));
+  data->kontrola = kontrola;
+
+  char* stav = nacti_polozky(string, strlen(kontrola));
+  data->stav = stav;
+
+  retrun data;
 }
 
 void nacist_soubor(spojovy_seznam* s, FILE* soubor){
@@ -141,37 +185,37 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
 		}
 		// zpracovani radku
 		int pocet_udaju = 0;
-		
+
 		char* nazev = nacti_polozky(string, 0);
 		data->nazev = nazev;
-		
+
 		char* typ = nacti_polozky(string, strlen(nazev));
 		data->typ = typ;
-		
+
 		char* cislo = nacti_polozky(string, strlen(typ));
 		data->cislo = cislo;
-		
+
 		char* odpovedny = nacti_polozky(string, strlen(cislo));
 		data->odpovedny = odpovedny;
-		
+
 		char* datum = nacti_polozky(string, strlen(odpovedny));
 		data->datum = datum;
-		
+
 		char* kontrola = nacti_polozky(string, strlen(datum));
 		data->kontrola = kontrola;
-		
+
 		char* stav = nacti_polozky(string, strlen(kontrola));
 		data->stav = stav;
-		
+
 		//vlozit data do seznamu
 		na_zacatek(&s, data);
-	
+
 	}
 }
 
 
 
 int main(){
-	
+
 	return 0;
 }

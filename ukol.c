@@ -63,35 +63,6 @@ bool fgetLine(FILE* soubor, char* string, int maxDelka)
     return false;
 }
 
-uzel* vytvor_uzel(data_typ* data){
-	uzel* uzl = malloc(sizeof(uzel));
-	if(uzl == NULL){
-		printf("chyba alokace\n");
-		return NULL;
-	}
-
-	uzl->data = data;
-	uzl->naslednik = NULL;
-
-	return uzl;
-}
-
-void na_zacatek(spojovy_seznam* s, data_typ* data){
-	uzel* uzl = vytvor_uzel(data);
-	if (uzl == NULL){
-		free(data);
-	}
-  printf("vytvoren uzel\n" );
-
-	if (s->zacatek != NULL){
-		uzl->naslednik = s->zacatek;
-		s->zacatek = uzl;
-	} else {
-		s->zacatek = uzl;
-		s->konec = uzl;
-	}
-}
-
 void vypis_data(data_typ* data){
 	printf("%s %s %s %s %s %s %s \n",
             data->nazev,
@@ -104,16 +75,50 @@ void vypis_data(data_typ* data){
         );
 }
 
+uzel* vytvor_uzel(data_typ* data){
+	uzel* uzl = malloc(sizeof(uzel));
+	if(uzl == NULL){
+		printf("chyba alokace\n");
+		return NULL;
+	}
+  printf("vytvor_uzel succsesful\n");
+
+	uzl->data = data;
+  printf("data prirazena uzlu\n");
+	uzl->naslednik = NULL;
+  printf("naslednik nastaven NULL \n" );
+  vypis_data(uzl->data);
+  printf("data vypsana\n " );
+
+	return uzl;
+}
+
+void na_zacatek(spojovy_seznam* s, data_typ* data){
+  printf("Davam na na_zacatek\n");
+	uzel* uzl = vytvor_uzel(data);
+	if (uzl == NULL){
+		free(data);
+	}
+  printf("vytvoren uzel\n" );
+  vypis_data(uzl->data);
+
+	if (s->zacatek != NULL){
+		uzl->naslednik = s->zacatek;
+		s->zacatek = uzl;
+	} else {
+		s->zacatek = uzl;
+		s->konec = uzl;
+	}
+}
+
 void vypis_seznam(spojovy_seznam* s){
 	printf("\nVypis seznamu:\n");
 	uzel* naslednik = s->zacatek;
-	int i = 1;
 	if(naslednik == NULL)
 		printf("Prazdny seznam.\n");
 	while(naslednik != NULL){
 		vypis_data(naslednik->data);
 		naslednik = naslednik->naslednik;
-		i++;
 	}
 	printf("\n");
 }
@@ -156,7 +161,6 @@ void nacti_polozku(const char* string, int zacatek, char* polozka){
         }
       }
   }
-  printf("%s\n", polozka);
 }
 
 int prazdna_polozka(char* polozka){
@@ -188,32 +192,23 @@ data_typ* zpracuj_radek(const char* string, data_typ* data){
   int zacatek = 0;
   nacti_polozku(string, zacatek, data->nazev);
   zacatek += strlen(data->nazev)+1;
-  printf("%s\n", data->nazev);
 
   nacti_polozku(string, zacatek, data->typ);
   zacatek += strlen(data->typ)+1;
-  printf("%s\n", data->typ);
 
   nacti_polozku(string, zacatek, data->cislo);
   zacatek += strlen(data->cislo)+1;
-  printf("%s\n", data->cislo);
 
   nacti_polozku(string, zacatek, data->odpovedny);
   zacatek += strlen(data->odpovedny)+1;
-  printf("%s\n", data->odpovedny);
 
   nacti_polozku(string, zacatek, data->datum);
   zacatek += strlen(data->datum)+1;
-  printf("%s\n", data->datum);
 
   nacti_polozku(string, zacatek, data->kontrola);
   zacatek += strlen(data->kontrola)+1;
-  printf("%s\n", data->datum);
-  printf("%s\n", data->kontrola);
 
   nacti_polozku(string, zacatek, data->stav);
-  printf("%s\n", data->stav);
-  printf("%s\n", data->datum);
 
   vypis_data(data);
 
@@ -304,7 +299,11 @@ int main(){
   nacist_soubor(&s, soubor);
 
   printf("nacten seznam\n" );
-
+  if (s.zacatek != NULL) {
+    vypis_data(s.zacatek->data);
+  } else{
+    printf("Prazdny seznam");
+  }
   vypis_seznam(&s);
 
   printf("vypsan seznam\n" );

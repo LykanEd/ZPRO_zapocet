@@ -188,7 +188,7 @@ void zpracuj_radek(const char* string, data_typ* data){
     }
   }
   if (pocet_stredniku != 6) {
-    data = NULL;
+    data->nazev[0] = '\0';
     printf("Prazdny radek\n" );
   } else{
     int zacatek = 0;
@@ -262,19 +262,19 @@ void nacist_soubor(spojovy_seznam* s, FILE* soubor){
     printf("data vytvorena, zpracovavam radek\n");
 		// zpracovani radku
 		zpracuj_radek(radek, data);
-    if (data == NULL) {
+    if (data->nazev[0] == '\0') {
       printf("Chybny format souboru\n");
-      return;
-    }
-    printf("radek zpracovan\n");
+    } else{
 
-    //vypis_data(data);
-    printf("\n" );
+      printf("radek zpracovan\n");
 
-		//vlozit data do seznamu
-		na_zacatek(s, data);
-    printf("radek vlozen do seznamu\n");
+      //vypis_data(data);
+      printf("\n" );
 
+  		//vlozit data do seznamu
+  		na_zacatek(s, data);
+      printf("radek vlozen do seznamu\n");
+      }
 	}
 }
 

@@ -140,28 +140,33 @@ void zrus_seznam(spojovy_seznam* s)
 
 void nacti_polozku(const char* string, int zacatek, char* polozka){
   int vytvoreno = 0;
-
-  // vytvoreni polozky, pokud bude nalezen strednik
-	for (int i = zacatek; i < strlen(string); i++){
-		if (string[i] == ';'){
-			for(int j = 0; j < i-zacatek; j++){
-				polozka[j] = string[zacatek + j];
-        if (j == i-zacatek - 1) {
-          polozka[j+1] = '\0';
+  // pokud by byly stredniky primo u sebe nebo za strednikem
+  // konec radku
+  if (string[zacatek] == ';' || string[zacatek] == '\0') {
+    polozka[0] = '\0';
+  }else {
+    // vytvoreni polozky, pokud bude nalezen strednik
+  	for (int i = zacatek; i < strlen(string); i++){
+  		if (string[i] == ';'){
+  			for(int j = 0; j < i-zacatek; j++){
+  				polozka[j] = string[zacatek + j];
+          if (j == i-zacatek - 1) {
+            polozka[j+1] = '\0';
+          }
+  			}
+        vytvoreno = 1;
+        break;
+  		}
+  	}
+    // vytvoreni polozky, pokud nebyl nalezen strednik
+    if(vytvoreno == 0){
+      for(int j = 0; j < strlen(string) - zacatek; j++){
+          polozka[j] = string[zacatek + j];
+          if (j == strlen(string) - zacatek - 1) {
+            polozka[j+1] = '\0';
+          }
         }
-			}
-      vytvoreno = 1;
-      break;
-		}
-	}
-  // vytvoreni polozky, pokud nebyl nalezen strednik
-  if(vytvoreno == 0){
-    for(int j = 0; j < strlen(string) - zacatek; j++){
-        polozka[j] = string[zacatek + j];
-        if (j == strlen(string) - zacatek - 1) {
-          polozka[j+1] = '\0';
-        }
-      }
+    }
   }
 }
 
@@ -269,7 +274,12 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 		// zpracovani radku
 		zpracuj_radek(radek, data);
     if (data->nazev[0] == '\0') {
-      printf("Chybny format souboru\n");
+      if (!feof(soubor)) {
+        // nebude zpusteno kvuli prazdnemu poslednimu radku
+        printf("Chybny format souboru\n");
+        zrus_seznam(s);
+        return 1;
+      }
     } else{
       // testovani dat
       int pocet_udaju = TEST_pocet_udaju(data);
@@ -295,7 +305,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test3.txt", "r");
+  FILE* soubor = fopen("test2.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;

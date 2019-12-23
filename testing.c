@@ -6,9 +6,9 @@
 
 
 
-void odstran_mezery(char string[,]){
+void odstran_mezery(char* string){
   int j = 0;
-  char nove[strlen(string)];
+  char* nove = malloc(sizeof(char[30]));
   int i = 0;
   while (string[i] == ' ') {
     i++;
@@ -30,10 +30,12 @@ void odstran_mezery(char string[,]){
   }
 
   nove[j] = '\0';
-  for (int i = 0; i < strlen(nove); i++) {
-    string[i] = nove[i];
-  }
-  printf(">>%s<<\n", string);
+  printf(">>%s<<\n", nove);
+  char* tmp = string;
+  string = NULL;
+  free(tmp);
+  tmp = NULL;
+  &string = nove;
 }
 
 void serad_inventarni_cislo(char icislo[]) {
@@ -78,13 +80,14 @@ void testing_mezery() {
 }
 
  int main() {
-  char* a = 'a';
-  char* b = 'b';
+  char* a = "ahoj";
+  char* b = "ahoj";
   a = b;
-  printf("%c\n", a);
-  printf("%c\n", b);
+  printf("%s\n", a);
+  printf("%s\n", b);
 
-  char* c = "ahojky ";
+  char* c = malloc(sizeof(char[30]));
+  c = "  ahojky ";
   odstran_mezery(c);
   printf(">%s<\n", c);
 

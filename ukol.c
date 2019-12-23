@@ -150,6 +150,7 @@ void zrus_seznam(spojovy_seznam* s)
 void odstran_mezery(char string[]){
   int j = 0;
   int i = 0;
+  // odstraneni mezer na zacatku
   while (string[i] == ' ') {
     i++;
   }
@@ -169,9 +170,10 @@ void odstran_mezery(char string[]){
     }
   }
   string[j] = '\0';
+  printf(">>%s<<\n", string);
 }
 
-void nacti_polozku(const char* string, int zacatek, char* polozka){
+void nacti_polozku(const char* string, int zacatek, char polozka[]){
   int vytvoreno = 0;
   // pokud by byly stredniky primo u sebe nebo za strednikem
   // konec radku
@@ -304,6 +306,7 @@ int TEST_datum(data_typ* data){
     printf("chyba dne\n");
     return 1;
   }
+  printf("datum OK");
   return 0;
 }
 
@@ -327,7 +330,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 		if(data == NULL){
 			printf("chyba alokace\n");
 			fclose(soubor);
-			return;
+			break;
 		}
     printf("data vytvorena, zpracovavam radek\n");
 		// zpracovani radku
@@ -352,6 +355,8 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
         zrus_seznam(s);
         return 1;
       }
+      odstran_mezery(data->cislo);
+      printf(">%s<\n", data->cislo);
 
       printf("radek zpracovan\n");
 
@@ -370,7 +375,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test6.txt", "r");
+  FILE* soubor = fopen("test0.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;

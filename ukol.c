@@ -248,6 +248,32 @@ int TEST_pocet_udaju(data_typ* data){
     return prazdne;
 }
 
+int TEST_datum(data_typ* data){
+  char *ptr;
+  printf("%s\n", data->datum);
+  char* date = data->datum;
+  printf("%s\n", date);
+
+  int den = strtol(date, &ptr, 10);
+  int mesic = strtol(ptr+1, &ptr, 10);
+  int rok = strtol(ptr+1, &ptr, 10);
+  printf("%d.%d.%d\n", den,mesic,rok);
+
+  if (1900 > rok || 2020 < rok) {
+    printf("chyba roku\n");
+    return 1;
+  }
+  if (1 > mesic || 12 < mesic) {
+    printf("chyba mesice\n");
+    return 1;
+  }
+  if (1 > den || 31 < den) {
+    printf("chyba dne\n");
+    return 1;
+  }
+  return 0;
+}
+
 //--------------------------------------------------------------
 
 int nacist_soubor(spojovy_seznam* s, FILE* soubor){
@@ -284,8 +310,14 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
       // testovani dat
       int pocet_udaju = TEST_pocet_udaju(data);
       if (pocet_udaju != 4) {
-        return 1;
+        printf("Testovaci error - chybny pocet udaju.\n");
         zrus_seznam(s);
+        return 1;
+      }
+      if (TEST_datum(data) != 0) {
+        printf("Testovaci error - chybny format data.\n");
+        zrus_seznam(s);
+        return 1;
       }
 
       printf("radek zpracovan\n");
@@ -305,7 +337,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test2.txt", "r");
+  FILE* soubor = fopen("test6.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;

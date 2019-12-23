@@ -4,6 +4,9 @@
 #include <string.h>
 #include <ctype.h>
 
+//--------------------------------------------------------------
+// DEKLARACE STRUKTUR
+
 // dopredna deklarace
  typedef struct uzel uzel;
 
@@ -34,7 +37,9 @@ typedef struct
 	uzel* konec;
 }spojovy_seznam;
 
+//--------------------------------------------------------------
 // funkce pro nacteni jednoho radku textu ze souboru
+
 bool fgetLine(FILE* soubor, char* string, int maxDelka)
 {
     for (int i = 0; i < maxDelka; i++) {
@@ -62,6 +67,9 @@ bool fgetLine(FILE* soubor, char* string, int maxDelka)
     printf("Chyba: radek je delsi nez maximalni povolena delka %d znaku.\n", maxDelka - 1);
     return false;
 }
+
+//--------------------------------------------------------------
+// PRACE SE SKTRUKTURAMI
 
 void vypis_data(data_typ* data){
 	printf("%s %s %s %s %s %s %s \n",
@@ -137,6 +145,31 @@ void zrus_seznam(spojovy_seznam* s)
 }
 
 //--------------------------------------------------------------
+// ZPRACOVANI SOUBORU
+
+void odstran_mezery(char string[]){
+  int j = 0;
+  int i = 0;
+  while (string[i] == ' ') {
+    i++;
+  }
+  for (i; i < strlen(string); i++) {
+    if (string[i] != ' ') {
+      string[j] = string[i];
+      j++;
+    } else{
+      for (int k = i; k < strlen(string); k++) {
+        if (string[k] != ' ') {
+          string[j] = ' ';
+          j++;
+          i = k-1;
+          break;
+        }
+      }
+    }
+  }
+  string[j] = '\0';
+}
 
 void nacti_polozku(const char* string, int zacatek, char* polozka){
   int vytvoreno = 0;

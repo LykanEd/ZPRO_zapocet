@@ -306,7 +306,60 @@ int TEST_datum(data_typ* data){
     printf("chyba dne\n");
     return 1;
   }
-  printf("datum OK");
+  printf("datum OK\n");
+  return 0;
+}
+
+int TEST_inventarni(data_typ* data){
+  odstran_mezery(data->cislo);
+
+  if (strlen(data->cislo)==15) {
+    int check = 0;
+    int pozice = 0;
+
+    // kontrola prvni je velke pismeno
+    if (data->cislo[pozice] >= 'A' && data->cislo[pozice] <= 'Z') {
+      pozice++;
+    } else{
+      return 1;
+    }
+    // kontrola druhe je cislo
+    if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
+      pozice++;
+    } else{
+      return 1;
+    }
+    // kontrola treti je pomlcka
+    if (data->cislo[pozice] == '-') {
+      pozice++;
+    } else{
+      return 1;
+    }
+    // kontrola dalsich osm je cislo
+    for (pozice; pozice < 11; pozice++) {
+      if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
+      } else{
+        return 1;
+      }
+    }
+    // kontrola dvanacte je lomitko
+    if (data->cislo[pozice] == '/') {
+      pozice++;
+    } else{
+      return 1;
+    }
+    // kontrolaposledni tri jsou cisla
+    for (pozice; pozice < 15; pozice++) {
+      if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
+      } else{
+        return 1;
+      }
+    }
+
+  } else{
+    return 1;
+  }
+
   return 0;
 }
 
@@ -355,8 +408,11 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
         zrus_seznam(s);
         return 1;
       }
-      odstran_mezery(data->cislo);
-      printf(">%s<\n", data->cislo);
+      if (TEST_inventarni(data) != 0) {
+        printf("Testovaci error - chybny format inventarniho cisla.\n");
+        zrus_seznam(s);
+        return 1;
+      }
 
       printf("radek zpracovan\n");
 
@@ -375,7 +431,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test0.txt", "r");
+  FILE* soubor = fopen("test7.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;

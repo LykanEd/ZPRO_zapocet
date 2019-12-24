@@ -84,5 +84,7 @@ void testing_mezery() {
   odstran_mezery(c);
   printf(">%s<\n", c);
 
+  printf("%d\n", strlen("Z8-12345678/111"));
+
   return 0;
 }

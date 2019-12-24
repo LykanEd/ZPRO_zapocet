@@ -364,6 +364,31 @@ int TEST_inventarni(data_typ* data){
 }
 
 //--------------------------------------------------------------
+// serazeni inventranich cisel
+
+uzel* max(uzel* zacatek){
+	uzel* maximum = zacatek;
+	while(zacatek != NULL){
+    int srovnani = strcmp(maximum->data->cislo, zacatek->data->cislo);
+		if(srovnani > 0)
+			maximum = zacatek;
+    zacatek = zacatek->naslednik;
+	}
+	return maximum;
+}
+
+void serad_seznam(spojovy_seznam* s){
+  uzel* dalsi = s->zacatek;
+  while(dalsi != NULL){
+    uzel* maximum = max(dalsi);
+    data_typ* tmp = dalsi->data;
+    dalsi->data = maximum->data;
+    maximum->data = tmp;
+    dalsi = dalsi->naslednik;
+  }
+}
+
+//--------------------------------------------------------------
 
 int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 	while(!feof(soubor)){
@@ -431,7 +456,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test7.txt", "r");
+  FILE* soubor = fopen("test1.txt", "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;
@@ -450,13 +475,16 @@ int main(){
     return 0;
   }
 
+  printf("Radim seznam\n");
+  serad_seznam(&s);
+  printf("Seznam serazen\n");
+
   printf("nacten seznam\n" );
   if (s.zacatek != NULL) {
-    vypis_data(s.zacatek->data);
+    vypis_seznam(&s);
   } else{
     printf("Prazdny seznam");
   }
-  vypis_seznam(&s);
 
   printf("vypsan seznam\n" );
 

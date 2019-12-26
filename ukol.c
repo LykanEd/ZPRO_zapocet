@@ -144,6 +144,39 @@ void zrus_seznam(spojovy_seznam* s)
 	s->konec = NULL;
 }
 
+void uloz_seznam(char* puvodni_soubor, spojovy_seznam* s){
+  char novy_soubor[] = "ZPRACOVANO_";
+  strcat(novy_soubor, puvodni_soubor);
+
+  FILE* zapis_soubor = fopen(novy_soubor, "w");
+	if (zapis_soubor == NULL) {
+	    printf("chyba otevreni souboru\n");
+	    return;
+	}
+  printf("Otevren soubor\n" );
+
+  printf("\nZapisuji do souboru:\n");
+  uzel* naslednik = s->zacatek;
+  if(naslednik == NULL)
+    printf("Prazdny seznam.\n");
+  while(naslednik != NULL){
+    fprintf(zapis_soubor, "%s ;  %s ;  %s ;  %s ;  %s ;  %s ;  %s\n",
+      naslednik->data->nazev,
+      naslednik->data->typ,
+      naslednik->data->cislo,
+      naslednik->data->odpovedny,
+      naslednik->data->datum,
+      naslednik->data->kontrola,
+      naslednik->data->stav
+    );
+    naslednik = naslednik->naslednik;
+  }
+  printf("\n");
+
+  fclose(zapis_soubor);
+
+}
+
 //--------------------------------------------------------------
 // ZPRACOVANI SOUBORU
 
@@ -456,7 +489,9 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
 
 int main(){
 
-  FILE* soubor = fopen("test1.txt", "r");
+  char soubor_nazev[] = "test9.txt";
+
+  FILE* soubor = fopen(soubor_nazev, "r");
 	if (soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return 1;
@@ -487,6 +522,8 @@ int main(){
   }
 
   printf("vypsan seznam\n" );
+
+  uloz_seznam(soubor_nazev, &s);
 
   fclose(soubor);
 	zrus_seznam(&s);

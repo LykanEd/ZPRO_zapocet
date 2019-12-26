@@ -73,7 +73,7 @@ void testing_mezery() {
   printf(">%s<\n", neco);
 }
 
- int main() {
+void main_mezery(){
   char* a = "ahoj";
   char* b = "ahoj";
   a = b;
@@ -86,6 +86,13 @@ void testing_mezery() {
 
   printf("%d\n", strcmp("A8-12345678/111", "A7-12345678/111"));
   printf("%d\n", strlen("Z8-12345678/111"));
+}
+
+
+ int main() {
+  char zacatek[] = "ZPRACOVANO";
+  strcat(zacatek, "test1.txt");
+  printf("%s\n", zacatek);
 
   return 0;
 }

@@ -145,20 +145,23 @@ void zrus_seznam(spojovy_seznam* s)
 }
 
 void uloz_seznam(char* puvodni_soubor, spojovy_seznam* s){
-  char novy_soubor[] = "ZPRACOVANO_";
+  char novy_soubor[35] = "ZPRACOVANO_";
   strcat(novy_soubor, puvodni_soubor);
 
+  uzel* naslednik = s->zacatek;
+  if(naslednik == NULL){
+    printf("Prazdny seznam.\n");
+    return;
+  }
   FILE* zapis_soubor = fopen(novy_soubor, "w");
 	if (zapis_soubor == NULL) {
 	    printf("chyba otevreni souboru\n");
 	    return;
 	}
-  printf("Otevren soubor\n" );
+  printf("Otevren soubor pro zapis\n" );
 
-  printf("\nZapisuji do souboru:\n");
-  uzel* naslednik = s->zacatek;
-  if(naslednik == NULL)
-    printf("Prazdny seznam.\n");
+  fprintf(zapis_soubor, "%s\n", "# Nazev polozky   ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky");
+
   while(naslednik != NULL){
     fprintf(zapis_soubor, "%s ;  %s ;  %s ;  %s ;  %s ;  %s ;  %s\n",
       naslednik->data->nazev,

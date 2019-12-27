@@ -90,14 +90,10 @@ uzel* vytvor_uzel(data_typ* data){
 		printf("chyba alokace\n");
 		return NULL;
 	}
-  printf("vytvor_uzel succsesful\n");
 
 	uzl->data = data;
-  printf("data prirazena uzlu\n");
 	uzl->naslednik = NULL;
-  printf("naslednik nastaven NULL \n" );
-  vypis_data(uzl->data);
-  printf("data vypsana\n " );
+
 
 	return uzl;
 }
@@ -321,16 +317,38 @@ int TEST_prazdny_string(char* string){
 }
 
 int TEST_pocet_udaju(data_typ* data){
+  /*
+  zkontroluje pocet udaju na radku, pokud jsou vsechny polozky vyplnene nebo
+  chybi vsechny polozky tykajici se kontroly, vrati hodnotu 4, jinak vraci jine
+  hodnoty int
+  */
     int prazdne = 0;
 
     prazdne += TEST_prazdny_string(data->nazev);
     prazdne += TEST_prazdny_string(data->typ);
     prazdne += TEST_prazdny_string(data->cislo);
     prazdne += TEST_prazdny_string(data->odpovedny);
+
+    int kontrola_stavu = 0;
+    kontrola_stavu += TEST_prazdny_string(data->datum);
+    kontrola_stavu += TEST_prazdny_string(data->kontrola);
+    kontrola_stavu += TEST_prazdny_string(data->stav);
+
+    /*
+    pokud jsou vyplnene jen nejake polozky tykajici se kontroly,
+    zmeni navratovou hodnotu tak, aby byl chybny pocit udaju
+    */
+    if (kontrola_stavu != 3 && kontrola_stavu != 0) {
+      prazdne--;
+    }
+
     return prazdne;
 }
 
 int TEST_datum(data_typ* data){
+  if (TEST_prazdny_string(data->datum) == 0) {
+    return 0;
+  }
   char *ptr;
   printf("%s\n", data->datum);
   char* date = data->datum;

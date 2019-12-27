@@ -84,7 +84,6 @@ void vypis_data(data_typ* data){
 }
 
 uzel* vytvor_uzel(data_typ* data){
-  vypis_data(data);
 	uzel* uzl = malloc(sizeof(uzel));
 	if(uzl == NULL){
 		printf("chyba alokace\n");
@@ -99,14 +98,10 @@ uzel* vytvor_uzel(data_typ* data){
 }
 
 void na_zacatek(spojovy_seznam* s, data_typ* data){
-  printf("Davam na na_zacatek\n");
-  vypis_data(data);
 	uzel* uzl = vytvor_uzel(data);
 	if (uzl == NULL){
 		free(data);
 	}
-  printf("vytvoren uzel\n" );
-  vypis_data(uzl->data);
 
 	if (s->zacatek != NULL){
 		uzl->naslednik = s->zacatek;
@@ -119,6 +114,7 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 
 void vypis_seznam(spojovy_seznam* s){
 	printf("\nVypis seznamu:\n");
+  printf("Nazev polozky ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky\n");
 	uzel* naslednik = s->zacatek;
 	if(naslednik == NULL)
 		printf("Prazdny seznam.\n");
@@ -154,7 +150,6 @@ void uloz_seznam(char* puvodni_soubor, spojovy_seznam* s){
 	    printf("chyba otevreni souboru\n");
 	    return;
 	}
-  printf("Otevren soubor pro zapis\n" );
 
   fprintf(zapis_soubor, "%s\n", "# Nazev polozky   ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky");
 
@@ -203,7 +198,6 @@ void odstran_mezery(char string[]){
     }
   }
   string[j] = '\0';
-  printf(">>%s<<\n", string);
 }
 
 void nacti_polozku(const char* string, int zacatek, char polozka[]){
@@ -262,7 +256,6 @@ void zpracuj_radek(const char* string, data_typ* data){
   }
   if (pocet_stredniku != 6) {
     data->nazev[0] = '\0';
-    printf("Prazdny radek\n" );
   } else{
     int zacatek = 0;
     nacti_polozku(string, zacatek, data->nazev);
@@ -284,8 +277,6 @@ void zpracuj_radek(const char* string, data_typ* data){
     zacatek += strlen(data->kontrola)+1;
 
     nacti_polozku(string, zacatek, data->stav);
-
-    vypis_data(data);
   }
 
 }
@@ -350,14 +341,11 @@ int TEST_datum(data_typ* data){
     return 0;
   }
   char *ptr;
-  printf("%s\n", data->datum);
   char* date = data->datum;
-  printf("%s\n", date);
 
   int den = strtol(date, &ptr, 10);
   int mesic = strtol(ptr+1, &ptr, 10);
   int rok = strtol(ptr+1, &ptr, 10);
-  printf("%d.%d.%d\n", den,mesic,rok);
 
   if (1900 > rok || 2020 < rok) {
     printf("chyba roku\n");
@@ -371,7 +359,6 @@ int TEST_datum(data_typ* data){
     printf("chyba dne\n");
     return 1;
   }
-  printf("datum OK\n");
   return 0;
 }
 
@@ -464,11 +451,11 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
 		fgetLine(soubor, radek, 1000);
 		// preskocit hlavicku
 		if (radek[0] == '#'){
-      printf("preskocen prvni\n");
+      printf("preskocen radek s komentarem\n\n");
 			continue;
       }
 		// vytvoreni dat
-    printf("neni prvni, vytvarim data\n");
+    printf("neni komentar, vytvarim data\n");
 		data_typ* data = malloc(sizeof(data_typ));
 		if(data == NULL){
 			printf("chyba alokace\n");
@@ -508,12 +495,9 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
 
       printf("radek zpracovan\n");
 
-      //vypis_data(data);
-      printf("\n" );
-
   		//vlozit data do seznamu
   		na_zacatek(s, data);
-      printf("radek vlozen do seznamu\n");
+      printf("radek vlozen do seznamu\n\n");
       }
 	}
   return 0;

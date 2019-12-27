@@ -180,6 +180,7 @@ void uloz_seznam(char* puvodni_soubor, spojovy_seznam* s){
 
 }
 
+
 //--------------------------------------------------------------
 // ZPRACOVANI SOUBORU
 
@@ -291,6 +292,16 @@ void zpracuj_radek(const char* string, data_typ* data){
     vypis_data(data);
   }
 
+}
+
+void spatna_kontrola(data_typ* data, spojovy_seznam* bez_kontroly) {
+  odstran_mezery(data->stav);
+  //printf(">>>>%s\n", data->stav);
+
+  if (strcmp(data->stav, "OK") != 0) {
+    printf("Stav neni OK, pridano do seznamu chybici kontroly.\n");
+    na_zacatek(bez_kontroly, data);
+  }
 }
 
 //--------------------------------------------------------------
@@ -426,7 +437,7 @@ void serad_seznam(spojovy_seznam* s){
 
 //--------------------------------------------------------------
 
-int nacist_soubor(spojovy_seznam* s, FILE* soubor){
+int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
 	while(!feof(soubor)){
     printf("NOVY radek\n");
 		// Precteni radku
@@ -475,6 +486,8 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
         return 1;
       }
 
+      spatna_kontrola(data, spatny_stav);
+
       printf("radek zpracovan\n");
 
       //vypis_data(data);
@@ -505,9 +518,13 @@ int main(){
 	s.zacatek = NULL;
 	s.konec = NULL;
 
+  spojovy_seznam spatny_stav;
+	spatny_stav.zacatek = NULL;
+	spatny_stav.konec = NULL;
+
   printf("Vytvoren seznam\n" );
 
-  int check = nacist_soubor(&s, soubor);
+  int check = nacist_soubor(&s, soubor, &spatny_stav);
   if (check != 0) {
     printf("Nekompletni seznam\n");
     return 0;
@@ -523,12 +540,20 @@ int main(){
   } else{
     printf("Prazdny seznam");
   }
-
   printf("vypsan seznam\n" );
 
+  printf("Ukladam do souboru.\n");
   uloz_seznam(soubor_nazev, &s);
+  printf("Ulozeno do souboru.\n");
+
+  printf("Vypisuji seznam polozek s nevyhovujicim stavem:\n");
+  vypis_seznam(&spatny_stav);
+  printf("Seznam vypsan\n");
 
   fclose(soubor);
 	zrus_seznam(&s);
+  zrus_seznam(&spatny_stav);
+
+  printf("Soubor uzavren, seznamy smazany.\n");
 	return 0;
 }

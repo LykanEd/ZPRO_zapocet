@@ -189,7 +189,7 @@ void uloz_seznam(char* puvodni_soubor, spojovy_seznam* s){
     );
     naslednik = naslednik->naslednik;
   }
-  printf("\n");
+  printf("Zapsano do souboru %s\n", novy_soubor);
 
   fclose(zapis_soubor);
 

@@ -372,15 +372,15 @@ int TEST_datum(data_typ* data){
   int rok = strtol(ptr+1, &ptr, 10);
 
   if (1900 > rok || 2020 < rok) {
-    printf("chyba roku\n");
+    printf("Chyba roku\n");
     return 1;
   }
   if (1 > mesic || 12 < mesic) {
-    printf("chyba mesice\n");
+    printf("Chyba mesice\n");
     return 1;
   }
   if (1 > den || 31 < den) {
-    printf("chyba dne\n");
+    printf("Chyba dne\n");
     return 1;
   }
   return 0;
@@ -467,33 +467,39 @@ void serad_seznam(spojovy_seznam* s){
 //--------------------------------------------------------------
 
 int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
-	while(!feof(soubor)){
-    printf("NOVY radek\n");
+  int cislo_radku = 1;
+  while(!feof(soubor)){
+    printf("NOVY radek - cislo %d\n", cislo_radku);
+    cislo_radku++;
 		// Precteni radku
-    printf("nacten radek\n");
+    printf("Nacten radek\n");
 		char radek[1000];
 		fgetLine(soubor, radek, 1000);
 		// preskocit hlavicku
 		if (radek[0] == '#'){
-      printf("preskocen radek s komentarem\n\n");
+      printf("Preskocen radek s komentarem\n\n");
 			continue;
       }
 		// vytvoreni dat
-    printf("neni komentar, vytvarim data\n");
+    printf("Radek neni komentar, vytvarim data\n");
 		data_typ* data = malloc(sizeof(data_typ));
 		if(data == NULL){
 			printf("chyba alokace\n");
 			fclose(soubor);
 			break;
 		}
-    printf("data vytvorena, zpracovavam radek\n");
+    printf("Data vytvorena, zpracovavam radek\n");
 		// zpracovani radku
 		zpracuj_radek(radek, data);
     if (data->nazev[0] == '\0') {
       if (!feof(soubor)) {
         // nebude zpusteno kvuli prazdnemu poslednimu radku
-        printf("Chybny format souboru\n");
+        printf("Chybny nazev souboru\n");
         return 1;
+      }
+      if (cislo_radku == 1 || cislo_radku == 2) {
+        printf("Soubor nema zadna data.\n");
+        return 2;
       }
     } else{
       // testovani dat
@@ -521,6 +527,13 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
       }
 	}
   return 0;
+}
+
+void uzavri(FILE* soubor, spojovy_seznam* s, spojovy_seznam* spatny_stav) {
+  zrus_seznam(s);
+  zrus_seznam(spatny_stav);
+  fclose(soubor);
+  printf("Soubor uzavren, seznamy smazany.\n");
 }
 
 
@@ -552,12 +565,13 @@ int main(){
   printf("Vytvoren seznam\n" );
 
   int check = nacist_soubor(&s, soubor, &spatny_stav);
+  if (check == 2) {
+    uzavri(soubor, &s, &spatny_stav);
+    return 0;
+  }
   if (check != 0) {
     printf("Nekompletni seznam\n");
-    zrus_seznam(&s);
-    zrus_seznam(&spatny_stav);
-    fclose(soubor);
-    printf("Soubor uzavren, seznamy smazany.\n");
+    uzavri(soubor, &s, &spatny_stav);
     return 0;
   }
 
@@ -569,7 +583,7 @@ int main(){
   if (s.zacatek != NULL) {
     vypis_seznam(&s);
   } else{
-    printf("Prazdny seznam");
+    printf("Prazdny seznam\n");
   }
   printf("Seznam vypsan\n" );
 
@@ -581,10 +595,7 @@ int main(){
   vypis_seznam(&spatny_stav);
   printf("Seznam vypsan\n");
 
-  fclose(soubor);
-	zrus_seznam(&s);
-  zrus_seznam(&spatny_stav);
+  uzavri(soubor, &s, &spatny_stav);
 
-  printf("Soubor uzavren, seznamy smazany.\n");
 	return 0;
 }

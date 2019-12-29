@@ -493,7 +493,6 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
       if (!feof(soubor)) {
         // nebude zpusteno kvuli prazdnemu poslednimu radku
         printf("Chybny format souboru\n");
-        zrus_seznam(s);
         return 1;
       }
     } else{
@@ -501,17 +500,14 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
       int pocet_udaju = TEST_pocet_udaju(data);
       if (pocet_udaju != 4) {
         printf("Testovaci error - chybny pocet udaju.\n");
-        zrus_seznam(s);
         return 1;
       }
       if (TEST_datum(data) != 0) {
         printf("Testovaci error - chybny format data.\n");
-        zrus_seznam(s);
         return 1;
       }
       if (TEST_inventarni(data) != 0) {
         printf("Testovaci error - chybny format inventarniho cisla.\n");
-        zrus_seznam(s);
         return 1;
       }
 
@@ -558,6 +554,10 @@ int main(){
   int check = nacist_soubor(&s, soubor, &spatny_stav);
   if (check != 0) {
     printf("Nekompletni seznam\n");
+    zrus_seznam(s);
+    zrus_seznam(spatny_stav);
+    fclose(soubor);
+    printf("Soubor uzavren, seznamy smazany.\n");
     return 0;
   }
 

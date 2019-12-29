@@ -554,8 +554,8 @@ int main(){
   int check = nacist_soubor(&s, soubor, &spatny_stav);
   if (check != 0) {
     printf("Nekompletni seznam\n");
-    zrus_seznam(s);
-    zrus_seznam(spatny_stav);
+    zrus_seznam(&s);
+    zrus_seznam(&spatny_stav);
     fclose(soubor);
     printf("Soubor uzavren, seznamy smazany.\n");
     return 0;

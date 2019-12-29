@@ -37,6 +37,30 @@ typedef struct
 	uzel* konec;
 }spojovy_seznam;
 
+// funkce pro nacteni jednoho radku textu z terminalu
+bool getLine(char* string, int maxDelka)
+{
+    for (int i = 0; i < maxDelka; i++) {
+        // precti znak z terminalu
+        int znak = getchar();
+
+        // zkontroluj, jestli neni konec vstupu
+        if (znak != EOF && znak != '\n')
+            string[i] = znak;
+        else {
+            // konec vstupu - ukonci string a prerus cyklus
+            string[i] = '\0';
+            return true;
+        }
+    }
+
+    // v cyklu jsme nedosli ke znaku EOF ani k '\n' - vstup je delsi nez (maxDelka - 1)
+    // (vypisujeme maxDelka - 1, protoze posledni znak musi byt '\0', ktery ale uzivatel nezadava)
+    printf("Chyba: vstup je delsi nez maximalni povolena delka %d znaku.\n", maxDelka - 1);
+    return false;
+}
+
+
 //--------------------------------------------------------------
 // funkce pro nacteni jednoho radku textu ze souboru
 
@@ -507,7 +531,12 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
 
 int main(){
 
-  char soubor_nazev[] = "test9.txt";
+  printf("Zadejte nazev souboru s daty: ");
+  int max_delka = 40;
+  char soubor_nazev[max_delka];
+  getLine(soubor_nazev, max_delka);
+  printf("\n");
+
 
   FILE* soubor = fopen(soubor_nazev, "r");
 	if (soubor == NULL) {
@@ -536,13 +565,13 @@ int main(){
   serad_seznam(&s);
   printf("Seznam serazen\n");
 
-  printf("nacten seznam\n" );
+  printf("Nacten seznam\n" );
   if (s.zacatek != NULL) {
     vypis_seznam(&s);
   } else{
     printf("Prazdny seznam");
   }
-  printf("vypsan seznam\n" );
+  printf("Seznam vypsan\n" );
 
   printf("Ukladam do souboru.\n");
   uloz_seznam(soubor_nazev, &s);

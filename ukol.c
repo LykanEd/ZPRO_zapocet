@@ -15,12 +15,12 @@ typedef struct
 {
 	// datove polozky
 	char	nazev[30];
-	char 	typ[15];
-	char	cislo[20];
-	char 	odpovedny[25];
-	char	datum[25];
-	char 	kontrola[30];
-	char	stav[15];
+	char 	typ[25];
+	char	cislo[30];
+	char 	odpovedny[30];
+	char	datum[30];
+	char 	kontrola[35];
+	char	stav[25];
 }data_typ;
 
 struct uzel

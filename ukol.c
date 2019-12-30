@@ -278,7 +278,7 @@ void zpracuj_radek(const char* string, data_typ* data){
       pocet_stredniku++;
     }
   }
-  if (pocet_stredniku != 6) {
+  if (pocet_stredniku != 6 && pocet_stredniku != 3) {
     data->nazev[0] = '\0';
   } else{
     int zacatek = 0;
@@ -294,15 +294,16 @@ void zpracuj_radek(const char* string, data_typ* data){
     nacti_polozku(string, zacatek, data->odpovedny);
     zacatek += strlen(data->odpovedny)+1;
 
-    nacti_polozku(string, zacatek, data->datum);
-    zacatek += strlen(data->datum)+1;
+    if (pocet_stredniku == 6) {
+      nacti_polozku(string, zacatek, data->datum);
+      zacatek += strlen(data->datum)+1;
 
-    nacti_polozku(string, zacatek, data->kontrola);
-    zacatek += strlen(data->kontrola)+1;
+      nacti_polozku(string, zacatek, data->kontrola);
+      zacatek += strlen(data->kontrola)+1;
 
-    nacti_polozku(string, zacatek, data->stav);
+      nacti_polozku(string, zacatek, data->stav);
+    }
   }
-
 }
 
 void spatna_kontrola(data_typ* data, spojovy_seznam* bez_kontroly) {

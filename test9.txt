@@ -1,5 +1,9 @@
 # Nazev polozky   ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky
 kancelarska zidle ; nabytek     ; A8-12345678/111  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; OK
-stul              ; nabytek     ; A7-12345679/111  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; poskozeno
-dvere             ; nabytek     ; B8-12345680/110  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; nenalezeno
-schodiste         ; stavebni    ; Z8-12345681/110  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; chybi
+stul              ; nabytek     ; A7-12345679/111  ; Jan Novak       ; 3.10.2019      ; Josef Kozel        ; poskozeno
+dvere             ; nabytek     ; B8-12345680/110  ; Jan Novak       ; 1.11.2019      ; Josef Kozel        ; nenalezeno
+schodiste         ; stavebni    ; Z8-12345801/110  ; Jan Novak       ; 4.5.2019       ; Josef Kozel        ; chybi
+policka           ; nabytek     ; A8-54103645/111  ; Emil Novak      ; 3.3.2019       ; Josef Kozel        ; OK
+skrin             ; nabytek     ; C7-65204960/111  ; Emil Novak      ; 10.3.2019      ; Josef Kozel        ; poskozeno
+okno              ; stavebni    ; S8-12345680/110  ; Jan Novak       ; 7.12.2019      ; Josef Kozel        ; nenalezeno
+monitor           ; nabytek     ; Z8-32002223/110  ; Jan Novak       ; 28.2.2019      ; Josef Kozel        ; chybi

@@ -497,10 +497,6 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
         printf("Chybny nazev souboru\n");
         return 1;
       }
-      if (cislo_radku == 1 || cislo_radku == 2) {
-        printf("Soubor nema zadna data.\n");
-        return 2;
-      }
     } else{
       // testovani dat
       int pocet_udaju = TEST_pocet_udaju(data);
@@ -582,18 +578,18 @@ int main(){
   printf("Nacten seznam\n" );
   if (s.zacatek != NULL) {
     vypis_seznam(&s);
+    printf("Seznam vypsan\n" );
+
+    printf("Ukladam do souboru.\n");
+    uloz_seznam(soubor_nazev, &s);
+    printf("Ulozeno do souboru.\n");
+
+    printf("Vypisuji seznam polozek s nevyhovujicim stavem:\n");
+    vypis_seznam(&spatny_stav);
+    printf("Seznam vypsan\n");
   } else{
-    printf("Prazdny seznam\n");
+    printf("\nSeznam neobsahuje zadna data\n");
   }
-  printf("Seznam vypsan\n" );
-
-  printf("Ukladam do souboru.\n");
-  uloz_seznam(soubor_nazev, &s);
-  printf("Ulozeno do souboru.\n");
-
-  printf("Vypisuji seznam polozek s nevyhovujicim stavem:\n");
-  vypis_seznam(&spatny_stav);
-  printf("Seznam vypsan\n");
 
   uzavri(soubor, &s, &spatny_stav);
 

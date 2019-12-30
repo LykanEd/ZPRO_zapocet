@@ -31,7 +31,7 @@ Program vypíše, že na daném řádku je chybný formát data, a nic neuloží
 
 Program vypíše, že na daném řádku je chybný formát inventárního čísla, a nic neuloží.
 
-### test7.txt
+### test9.txt
 Všechny položky v pořádku.
 
 Program vypíše položky s nevyhovující kontrolou, sežazený seznam uloží.

@@ -1,0 +1,2 @@
+# Nazev polozky   ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky
+kancelarska zidle ; nabytek     ; Z8-12345678/111  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; OK

@@ -294,15 +294,13 @@ void zpracuj_radek(const char* string, data_typ* data){
     nacti_polozku(string, zacatek, data->odpovedny);
     zacatek += strlen(data->odpovedny)+1;
 
-    if (pocet_stredniku == 6) {
-      nacti_polozku(string, zacatek, data->datum);
-      zacatek += strlen(data->datum)+1;
+    nacti_polozku(string, zacatek, data->datum);
+    zacatek += strlen(data->datum)+1;
 
-      nacti_polozku(string, zacatek, data->kontrola);
-      zacatek += strlen(data->kontrola)+1;
+    nacti_polozku(string, zacatek, data->kontrola);
+    zacatek += strlen(data->kontrola)+1;
 
-      nacti_polozku(string, zacatek, data->stav);
-    }
+    nacti_polozku(string, zacatek, data->stav);
   }
 }
 

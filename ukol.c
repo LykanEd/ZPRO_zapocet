@@ -474,7 +474,7 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
 		// Precteni radku
     printf("Nacten radek\n");
 		char radek[1000];
-		fgetLine(soubor, radek, 1000);
+		bool nacteno = fgetLine(soubor, radek, 1000);
 		// preskocit hlavicku
 		if (radek[0] == '#'){
       printf("Preskocen radek s komentarem\n\n");

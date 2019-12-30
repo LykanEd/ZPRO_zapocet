@@ -578,8 +578,8 @@ int main(){
 
   printf("Nacten seznam\n" );
   if (s.zacatek != NULL) {
-    vypis_seznam(&s);
-    printf("Seznam vypsan\n" );
+    // vypis_seznam(&s);
+    // printf("Seznam vypsan\n" );
 
     printf("Ukladam do souboru.\n");
     uloz_seznam(soubor_nazev, &s);

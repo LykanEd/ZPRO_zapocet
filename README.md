@@ -42,3 +42,7 @@ Program vypíše položky s nevyhovující kontrolou, sežazený seznam uloží.
 3. Položka datum kontroly, kontrolujici osoba a stav musí být buď všechny prázdné nebo všechny neprázdné.
 4. Den kontroly musí být v rozmezí 1-31, měsíc kontroly 1-12, rok kontroly 1900-2020.
 5. Inventární číslo musí být v uvedeném tvaru, tedy: A7-12345679/111 (kontroluje se délka, pozice číslic a písmen, pozice lomítka a pomlčky)
+
+## Výstup programu
+1. Vypsání položek s nevyhovující kontroulou v příkazovém řádku.
+2. Seřazení jednotlivých záznamů podle inventárního čísla a uložení do souboru.

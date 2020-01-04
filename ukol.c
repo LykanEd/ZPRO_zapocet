@@ -29,6 +29,8 @@ struct uzel
 	data_typ* data;
 	// ukazatel na nasledujici prvek
 	uzel* naslednik;
+  // kontrola stavu polozky
+  bool kontrola;
 };
 
 typedef struct
@@ -107,7 +109,7 @@ void vypis_data(data_typ* data){
         );
 }
 
-uzel* vytvor_uzel(data_typ* data){
+uzel* vytvor_uzel(data_typ* data, bool kontrola){
 	uzel* uzl = malloc(sizeof(uzel));
 	if(uzl == NULL){
 		printf("chyba alokace\n");
@@ -115,14 +117,15 @@ uzel* vytvor_uzel(data_typ* data){
 	}
 
 	uzl->data = data;
+  uzl->kontrola = kontrola;
 	uzl->naslednik = NULL;
 
 
 	return uzl;
 }
 
-void na_zacatek(spojovy_seznam* s, data_typ* data){
-	uzel* uzl = vytvor_uzel(data);
+void na_zacatek(spojovy_seznam* s, data_typ* data, bool kontrola){
+	uzel* uzl = vytvor_uzel(data, kontrola);
 	if (uzl == NULL){
 		free(data);
 	}
@@ -136,14 +139,16 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 	}
 }
 
-void vypis_seznam(spojovy_seznam* s){
+void vypis_seznam(spojovy_seznam* s, bool kontrola){
 	printf("\nVypis seznamu:\n");
   printf("Nazev polozky ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky\n");
 	uzel* naslednik = s->zacatek;
 	if(naslednik == NULL)
 		printf("Prazdny seznam.\n");
 	while(naslednik != NULL){
-		vypis_data(naslednik->data);
+    // vypise pouze data s odpovidajici kontrolou
+    if(naslednik->kontrola == kontrola)
+		  vypis_data(naslednik->data);
 		naslednik = naslednik->naslednik;
 	}
 	printf("\n");
@@ -304,14 +309,15 @@ void zpracuj_radek(const char* string, data_typ* data){
   }
 }
 
-void spatna_kontrola(data_typ* data, spojovy_seznam* bez_kontroly) {
+bool spatna_kontrola(data_typ* data) {
   odstran_mezery(data->stav);
   //printf(">>>>%s\n", data->stav);
 
   if (strcmp(data->stav, "OK") != 0) {
     printf("Stav neni OK, pridano do seznamu chybici kontroly.\n");
-    na_zacatek(bez_kontroly, data);
+    return false;
   }
+  return true;
 }
 
 //--------------------------------------------------------------
@@ -457,15 +463,18 @@ void serad_seznam(spojovy_seznam* s){
   while(dalsi != NULL){
     uzel* maximum = max(dalsi);
     data_typ* tmp = dalsi->data;
+    bool BOOL_tmp = dalsi->kontrola;
     dalsi->data = maximum->data;
+    dalsi->kontrola = maximum->kontrola;
     maximum->data = tmp;
+    maximum->kontrola = BOOL_tmp;
     dalsi = dalsi->naslednik;
   }
 }
 
 //--------------------------------------------------------------
 
-int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
+int nacist_soubor(spojovy_seznam* s, FILE* soubor){
   int cislo_radku = 1;
   while(!feof(soubor)){
     printf("NOVY radek - cislo %d\n", cislo_radku);
@@ -512,21 +521,20 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
         return 1;
       }
 
-      spatna_kontrola(data, spatny_stav);
+      bool kontrola = spatna_kontrola(data);
 
       printf("radek zpracovan\n");
 
   		//vlozit data do seznamu
-  		na_zacatek(s, data);
+  		na_zacatek(s, data, kontrola);
       printf("radek vlozen do seznamu\n\n");
       }
 	}
   return 0;
 }
 
-void uzavri(FILE* soubor, spojovy_seznam* s, spojovy_seznam* spatny_stav) {
+void uzavri(FILE* soubor, spojovy_seznam* s) {
   zrus_seznam(s);
-  zrus_seznam(spatny_stav);
   fclose(soubor);
   printf("Soubor uzavren, seznamy smazany.\n");
 }
@@ -553,20 +561,16 @@ int main(){
 	s.zacatek = NULL;
 	s.konec = NULL;
 
-  spojovy_seznam spatny_stav;
-	spatny_stav.zacatek = NULL;
-	spatny_stav.konec = NULL;
-
   printf("Vytvoren seznam\n" );
 
-  int check = nacist_soubor(&s, soubor, &spatny_stav);
+  int check = nacist_soubor(&s, soubor);
   if (check == 2) {
-    uzavri(soubor, &s, &spatny_stav);
+    uzavri(soubor, &s);
     return 0;
   }
   if (check != 0) {
     printf("Nekompletni seznam\n");
-    uzavri(soubor, &s, &spatny_stav);
+    uzavri(soubor, &s);
     return 0;
   }
 
@@ -584,13 +588,13 @@ int main(){
     printf("Ulozeno do souboru.\n");
 
     printf("Vypisuji seznam polozek s nevyhovujicim stavem:\n");
-    vypis_seznam(&spatny_stav);
+    vypis_seznam(&s, false);
     printf("Seznam vypsan\n");
   } else{
     printf("\nSeznam neobsahuje zadna data\n");
   }
 
-  uzavri(soubor, &s, &spatny_stav);
+  uzavri(soubor, &s);
 
 	return 0;
 }

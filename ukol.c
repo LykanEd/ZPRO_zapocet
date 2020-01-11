@@ -29,6 +29,8 @@ struct uzel
 	data_typ* data;
 	// ukazatel na nasledujici prvek
 	uzel* naslednik;
+  // kontrola stavu polozky
+  bool kontrola;
 };
 
 typedef struct
@@ -107,7 +109,7 @@ void vypis_data(data_typ* data){
         );
 }
 
-uzel* vytvor_uzel(data_typ* data){
+uzel* vytvor_uzel(data_typ* data, bool kontrola){
 	uzel* uzl = malloc(sizeof(uzel));
 	if(uzl == NULL){
 		printf("chyba alokace\n");
@@ -115,14 +117,15 @@ uzel* vytvor_uzel(data_typ* data){
 	}
 
 	uzl->data = data;
+  uzl->kontrola = kontrola;
 	uzl->naslednik = NULL;
 
 
 	return uzl;
 }
 
-void na_zacatek(spojovy_seznam* s, data_typ* data){
-	uzel* uzl = vytvor_uzel(data);
+void na_zacatek(spojovy_seznam* s, data_typ* data, bool kontrola){
+	uzel* uzl = vytvor_uzel(data, kontrola);
 	if (uzl == NULL){
 		free(data);
 	}
@@ -136,14 +139,16 @@ void na_zacatek(spojovy_seznam* s, data_typ* data){
 	}
 }
 
-void vypis_seznam(spojovy_seznam* s){
+void vypis_seznam(spojovy_seznam* s, bool kontrola){
 	printf("\nVypis seznamu:\n");
   printf("Nazev polozky ; Typ polozky ; Inventarni cislo ; Odpovedna osoba ; Datum kontroly ; Kontrolujici osoba ; Stav polozky\n");
 	uzel* naslednik = s->zacatek;
 	if(naslednik == NULL)
 		printf("Prazdny seznam.\n");
 	while(naslednik != NULL){
-		vypis_data(naslednik->data);
+    // vypise pouze data s odpovidajici kontrolou
+    if(naslednik->kontrola == kontrola)
+		  vypis_data(naslednik->data);
 		naslednik = naslednik->naslednik;
 	}
 	printf("\n");
@@ -304,20 +309,21 @@ void zpracuj_radek(const char* string, data_typ* data){
   }
 }
 
-void spatna_kontrola(data_typ* data, spojovy_seznam* bez_kontroly) {
+bool spatna_kontrola(data_typ* data) {
   odstran_mezery(data->stav);
   //printf(">>>>%s\n", data->stav);
 
   if (strcmp(data->stav, "OK") != 0) {
     printf("Stav neni OK, pridano do seznamu chybici kontroly.\n");
-    na_zacatek(bez_kontroly, data);
+    return false;
   }
+  return true;
 }
 
 //--------------------------------------------------------------
 // TESTOVACI FUNKCE
 
-int TEST_prazdny_string(char* string){
+bool TEST_prazdny_string(char* string){
   /*
   Kontroluje, jestli je daný string prázdný, pokud ano, vrátí 0,
   pokud ne, vrátí 1;
@@ -336,12 +342,12 @@ int TEST_pocet_udaju(data_typ* data){
   chybi vsechny polozky tykajici se kontroly, vrati hodnotu 4, jinak vraci jine
   hodnoty int
   */
-    int prazdne = 0;
+    int neprazdne = 0;
 
-    prazdne += TEST_prazdny_string(data->nazev);
-    prazdne += TEST_prazdny_string(data->typ);
-    prazdne += TEST_prazdny_string(data->cislo);
-    prazdne += TEST_prazdny_string(data->odpovedny);
+    neprazdne += TEST_prazdny_string(data->nazev);
+    neprazdne += TEST_prazdny_string(data->typ);
+    neprazdne += TEST_prazdny_string(data->cislo);
+    neprazdne += TEST_prazdny_string(data->odpovedny);
 
     int kontrola_stavu = 0;
     kontrola_stavu += TEST_prazdny_string(data->datum);
@@ -353,16 +359,36 @@ int TEST_pocet_udaju(data_typ* data){
     zmeni navratovou hodnotu tak, aby byl chybny pocit udaju
     */
     if (kontrola_stavu != 3 && kontrola_stavu != 0) {
-      prazdne--;
+      neprazdne--;
     }
 
-    return prazdne;
+    if(neprazdne == 4){
+      return true;
+    } else {
+      return false;
+    }
 }
 
-int TEST_datum(data_typ* data){
+bool TEST_datum(data_typ* data){
   if (TEST_prazdny_string(data->datum) == 0) {
-    return 0;
+    return true;
   }
+  int pocet_tecek = 0;
+  odstran_mezery(data->datum);
+  for (int i = 0; i < strlen(data->datum); i++) {
+    if (data->datum[i] == '.') {
+      pocet_tecek++;
+      continue;
+    }
+    // kontrola, jestli v datu nejsou pismena
+    if(isalpha(data->datum[i])){
+      return false;
+    }
+  }
+  if (pocet_tecek != 2) {
+    return false;
+  }
+
   char *ptr;
   char* date = data->datum;
 
@@ -372,17 +398,17 @@ int TEST_datum(data_typ* data){
 
   if (1900 > rok || 2020 < rok) {
     printf("Chyba roku\n");
-    return 1;
+    return false;
   }
   if (1 > mesic || 12 < mesic) {
     printf("Chyba mesice\n");
-    return 1;
+    return false;
   }
   if (1 > den || 31 < den) {
     printf("Chyba dne\n");
-    return 1;
+    return false;
   }
-  return 0;
+  return true;
 }
 
 int TEST_inventarni(data_typ* data){
@@ -396,76 +422,79 @@ int TEST_inventarni(data_typ* data){
     if (data->cislo[pozice] >= 'A' && data->cislo[pozice] <= 'Z') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrola druhe je cislo
     if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrola treti je pomlcka
     if (data->cislo[pozice] == '-') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrola dalsich osm je cislo
     for (pozice; pozice < 11; pozice++) {
       if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
       } else{
-        return 1;
+        return false;
       }
     }
     // kontrola dvanacte je lomitko
     if (data->cislo[pozice] == '/') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrolaposledni tri jsou cisla
     for (pozice; pozice < 15; pozice++) {
       if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
       } else{
-        return 1;
+        return false;
       }
     }
 
   } else{
-    return 1;
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 //--------------------------------------------------------------
 // serazeni inventranich cisel
 
-uzel* max(uzel* zacatek){
-	uzel* maximum = zacatek;
+uzel* min(uzel* zacatek){
+	uzel* minimum = zacatek;
 	while(zacatek != NULL){
-    int srovnani = strcmp(maximum->data->cislo, zacatek->data->cislo);
+    int srovnani = strcmp(minimum->data->cislo, zacatek->data->cislo);
 		if(srovnani > 0)
-			maximum = zacatek;
+			minimum = zacatek;
     zacatek = zacatek->naslednik;
 	}
-	return maximum;
+	return minimum;
 }
 
 void serad_seznam(spojovy_seznam* s){
   uzel* dalsi = s->zacatek;
   while(dalsi != NULL){
-    uzel* maximum = max(dalsi);
+    uzel* maximum = min(dalsi);
     data_typ* tmp = dalsi->data;
+    bool BOOL_tmp = dalsi->kontrola;
     dalsi->data = maximum->data;
+    dalsi->kontrola = maximum->kontrola;
     maximum->data = tmp;
+    maximum->kontrola = BOOL_tmp;
     dalsi = dalsi->naslednik;
   }
 }
 
 //--------------------------------------------------------------
 
-int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
+int nacist_soubor(spojovy_seznam* s, FILE* soubor){
   int cislo_radku = 1;
   while(!feof(soubor)){
     printf("NOVY radek - cislo %d\n", cislo_radku);
@@ -493,40 +522,38 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor, spojovy_seznam* spatny_stav){
     if (data->nazev[0] == '\0') {
       if (!feof(soubor)) {
         // nebude zpusteno kvuli prazdnemu poslednimu radku
-        printf("Chybny nazev souboru\n");
+        printf("Chybny/nekompletni radek\n");
         return 1;
       }
     } else{
       // testovani dat
-      int pocet_udaju = TEST_pocet_udaju(data);
-      if (pocet_udaju != 4) {
+      if (!TEST_pocet_udaju(data)) {
         printf("Testovaci error - chybny pocet udaju.\n");
         return 1;
       }
-      if (TEST_datum(data) != 0) {
+      if (!TEST_datum(data)) {
         printf("Testovaci error - chybny format data.\n");
         return 1;
       }
-      if (TEST_inventarni(data) != 0) {
+      if (!TEST_inventarni(data)) {
         printf("Testovaci error - chybny format inventarniho cisla.\n");
         return 1;
       }
 
-      spatna_kontrola(data, spatny_stav);
+      bool kontrola = spatna_kontrola(data);
 
       printf("radek zpracovan\n");
 
   		//vlozit data do seznamu
-  		na_zacatek(s, data);
+  		na_zacatek(s, data, kontrola);
       printf("radek vlozen do seznamu\n\n");
       }
 	}
   return 0;
 }
 
-void uzavri(FILE* soubor, spojovy_seznam* s, spojovy_seznam* spatny_stav) {
+void uzavri(FILE* soubor, spojovy_seznam* s) {
   zrus_seznam(s);
-  zrus_seznam(spatny_stav);
   fclose(soubor);
   printf("Soubor uzavren, seznamy smazany.\n");
 }
@@ -553,20 +580,16 @@ int main(){
 	s.zacatek = NULL;
 	s.konec = NULL;
 
-  spojovy_seznam spatny_stav;
-	spatny_stav.zacatek = NULL;
-	spatny_stav.konec = NULL;
-
   printf("Vytvoren seznam\n" );
 
-  int check = nacist_soubor(&s, soubor, &spatny_stav);
+  int check = nacist_soubor(&s, soubor);
   if (check == 2) {
-    uzavri(soubor, &s, &spatny_stav);
+    uzavri(soubor, &s);
     return 0;
   }
   if (check != 0) {
     printf("Nekompletni seznam\n");
-    uzavri(soubor, &s, &spatny_stav);
+    uzavri(soubor, &s);
     return 0;
   }
 
@@ -584,13 +607,13 @@ int main(){
     printf("Ulozeno do souboru.\n");
 
     printf("Vypisuji seznam polozek s nevyhovujicim stavem:\n");
-    vypis_seznam(&spatny_stav);
+    vypis_seznam(&s, false);
     printf("Seznam vypsan\n");
   } else{
     printf("\nSeznam neobsahuje zadna data\n");
   }
 
-  uzavri(soubor, &s, &spatny_stav);
+  uzavri(soubor, &s);
 
 	return 0;
 }

@@ -467,21 +467,21 @@ int TEST_inventarni(data_typ* data){
 //--------------------------------------------------------------
 // serazeni inventranich cisel
 
-uzel* max(uzel* zacatek){
-	uzel* maximum = zacatek;
+uzel* min(uzel* zacatek){
+	uzel* minimum = zacatek;
 	while(zacatek != NULL){
-    int srovnani = strcmp(maximum->data->cislo, zacatek->data->cislo);
+    int srovnani = strcmp(minimum->data->cislo, zacatek->data->cislo);
 		if(srovnani > 0)
-			maximum = zacatek;
+			minimum = zacatek;
     zacatek = zacatek->naslednik;
 	}
-	return maximum;
+	return minimum;
 }
 
 void serad_seznam(spojovy_seznam* s){
   uzel* dalsi = s->zacatek;
   while(dalsi != NULL){
-    uzel* maximum = max(dalsi);
+    uzel* maximum = min(dalsi);
     data_typ* tmp = dalsi->data;
     bool BOOL_tmp = dalsi->kontrola;
     dalsi->data = maximum->data;

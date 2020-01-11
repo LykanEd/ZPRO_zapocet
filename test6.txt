@@ -2,4 +2,4 @@
 kancelarska zidle ; nabytek     ; Z8-12345678/111  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; OK
 stul              ; nabytek     ; Z8-12345679/111  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; poskozeno
 dvere             ; nabytek     ; Z8-12345680/110  ; Jan Novak       ; 1.12.2019      ; Josef Kozel        ; nenalezeno
-schodiste         ; stavebni    ; Z8-12345681/110  ; Jan Novak       ; 1.12     ; Josef Kozel        ; nenalezeno
+schodiste         ; stavebni    ; Z8-12345681/110  ; Jan Novak       ; 1a1.2.2019     ; Josef Kozel        ; nenalezeno

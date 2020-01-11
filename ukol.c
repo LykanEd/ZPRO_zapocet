@@ -323,7 +323,7 @@ bool spatna_kontrola(data_typ* data) {
 //--------------------------------------------------------------
 // TESTOVACI FUNKCE
 
-int TEST_prazdny_string(char* string){
+bool TEST_prazdny_string(char* string){
   /*
   Kontroluje, jestli je daný string prázdný, pokud ano, vrátí 0,
   pokud ne, vrátí 1;
@@ -342,12 +342,12 @@ int TEST_pocet_udaju(data_typ* data){
   chybi vsechny polozky tykajici se kontroly, vrati hodnotu 4, jinak vraci jine
   hodnoty int
   */
-    int prazdne = 0;
+    int neprazdne = 0;
 
-    prazdne += TEST_prazdny_string(data->nazev);
-    prazdne += TEST_prazdny_string(data->typ);
-    prazdne += TEST_prazdny_string(data->cislo);
-    prazdne += TEST_prazdny_string(data->odpovedny);
+    neprazdne += TEST_prazdny_string(data->nazev);
+    neprazdne += TEST_prazdny_string(data->typ);
+    neprazdne += TEST_prazdny_string(data->cislo);
+    neprazdne += TEST_prazdny_string(data->odpovedny);
 
     int kontrola_stavu = 0;
     kontrola_stavu += TEST_prazdny_string(data->datum);
@@ -359,16 +359,36 @@ int TEST_pocet_udaju(data_typ* data){
     zmeni navratovou hodnotu tak, aby byl chybny pocit udaju
     */
     if (kontrola_stavu != 3 && kontrola_stavu != 0) {
-      prazdne--;
+      neprazdne--;
     }
 
-    return prazdne;
+    if(neprazdne == 4){
+      return true;
+    } else {
+      return false;
+    }
 }
 
-int TEST_datum(data_typ* data){
+bool TEST_datum(data_typ* data){
   if (TEST_prazdny_string(data->datum) == 0) {
-    return 0;
+    return true;
   }
+  int pocet_tecek = 0;
+  odstran_mezery(data->datum);
+  for (int i = 0; i < strlen(data->datum); i++) {
+    if (data->datum[i] == '.') {
+      pocet_tecek++;
+      continue;
+    }
+    // kontrola, jestli v datu nejsou pismena
+    if(isalpha(data->datum[i])){
+      return false;
+    }
+  }
+  if (pocet_tecek != 2) {
+    return false;
+  }
+
   char *ptr;
   char* date = data->datum;
 
@@ -378,17 +398,17 @@ int TEST_datum(data_typ* data){
 
   if (1900 > rok || 2020 < rok) {
     printf("Chyba roku\n");
-    return 1;
+    return false;
   }
   if (1 > mesic || 12 < mesic) {
     printf("Chyba mesice\n");
-    return 1;
+    return false;
   }
   if (1 > den || 31 < den) {
     printf("Chyba dne\n");
-    return 1;
+    return false;
   }
-  return 0;
+  return true;
 }
 
 int TEST_inventarni(data_typ* data){
@@ -402,46 +422,46 @@ int TEST_inventarni(data_typ* data){
     if (data->cislo[pozice] >= 'A' && data->cislo[pozice] <= 'Z') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrola druhe je cislo
     if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrola treti je pomlcka
     if (data->cislo[pozice] == '-') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrola dalsich osm je cislo
     for (pozice; pozice < 11; pozice++) {
       if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
       } else{
-        return 1;
+        return false;
       }
     }
     // kontrola dvanacte je lomitko
     if (data->cislo[pozice] == '/') {
       pozice++;
     } else{
-      return 1;
+      return false;
     }
     // kontrolaposledni tri jsou cisla
     for (pozice; pozice < 15; pozice++) {
       if (data->cislo[pozice] >= '0' && data->cislo[pozice] <= '9') {
       } else{
-        return 1;
+        return false;
       }
     }
 
   } else{
-    return 1;
+    return false;
   }
 
-  return 0;
+  return true;
 }
 
 //--------------------------------------------------------------
@@ -502,21 +522,20 @@ int nacist_soubor(spojovy_seznam* s, FILE* soubor){
     if (data->nazev[0] == '\0') {
       if (!feof(soubor)) {
         // nebude zpusteno kvuli prazdnemu poslednimu radku
-        printf("Chybny nazev souboru\n");
+        printf("Chybny/nekompletni radek\n");
         return 1;
       }
     } else{
       // testovani dat
-      int pocet_udaju = TEST_pocet_udaju(data);
-      if (pocet_udaju != 4) {
+      if (!TEST_pocet_udaju(data)) {
         printf("Testovaci error - chybny pocet udaju.\n");
         return 1;
       }
-      if (TEST_datum(data) != 0) {
+      if (!TEST_datum(data)) {
         printf("Testovaci error - chybny format data.\n");
         return 1;
       }
-      if (TEST_inventarni(data) != 0) {
+      if (!TEST_inventarni(data)) {
         printf("Testovaci error - chybny format inventarniho cisla.\n");
         return 1;
       }

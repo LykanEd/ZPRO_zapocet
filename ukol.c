@@ -404,9 +404,24 @@ bool TEST_datum(data_typ* data){
     printf("Chyba mesice\n");
     return false;
   }
-  if (1 > den || 31 < den) {
-    printf("Chyba dne\n");
-    return false;
+  if ((mesic <= 7 && mesic%2 == 1) || (mesic > 7 && mesic%2 == 0) ) {
+    if (1 > den || 31 < den) {
+      printf("Chyba dne\n");
+      return false;
+    }
+  } else{
+    if (1 > den || 30 < den) {
+      printf("Chyba dne\n");
+      return false;
+    }
+    if (mesic == 2 && rok%4 != 0 && 28 < den) {
+      printf("Chyba dne\n");
+      return false;
+    }
+    if (mesic == 2 && rok%4 == 0 && 29 < den) {
+      printf("Chyba dne\n");
+      return false;
+    }
   }
   return true;
 }
